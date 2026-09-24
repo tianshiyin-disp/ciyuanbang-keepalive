@@ -1,0 +1,24 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # 每天 UTC 0:00（北京时间 8:00）执行
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          echo "🔄 开始保活 Supabase..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://oefpjaojrdopouxjciov.supabase.co/rest/v1/" \
+            -H "apikey: 你的anon_key")
+          echo "✅ 响应状态码: $response"
+          if [ "$response" = "200" ] || [ "$response" = "404" ] || [ "$response" = "401" ]; then
+            echo "✅ Supabase 保活成功"
+          else
+            echo "⚠️ 保活异常，状态码: $response"
+          fi
